@@ -15,6 +15,7 @@ import {
   ArrowUpRight,
   ShieldCheck,
 } from 'lucide-react';
+import { Modal } from '@/components/Modal';
 
 export function ProjectsGallery({ initialProjects = initialPortfolioData.projects }: { initialProjects?: Project[] }) {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
@@ -202,25 +203,15 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
       </div>
 
       {/* Project Details Modal */}
-      {activeModalProject && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={() => setActiveModalProject(null)}
-        >
-          <div
-            className="relative w-full max-w-2xl bg-slate-950 border border-cyan-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-left"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setActiveModalProject(null)}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:border-cyan-400 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
+      <Modal
+        isOpen={!!activeModalProject}
+        onClose={() => setActiveModalProject(null)}
+        maxWidth="max-w-2xl"
+      >
+        {activeModalProject && (
+          <div>
             {/* Modal Image */}
-            <div className="relative h-56 sm:h-64 w-full rounded-2xl overflow-hidden mb-6 bg-slate-900">
+            <div className="relative h-56 sm:h-64 w-full rounded-2xl overflow-hidden mb-6 bg-slate-900 border border-slate-800">
               <Image
                 src={activeModalProject.image || '/img/projects/todo-list.png'}
                 alt={activeModalProject.title}
@@ -293,8 +284,8 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </section>
   );
 }

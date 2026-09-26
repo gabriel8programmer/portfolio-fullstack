@@ -2,9 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Github, Linkedin, Shield, Code2, Heart, ArrowUp } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Github, Linkedin, Shield, Code2, ArrowUp, ArrowLeft } from 'lucide-react';
 
 export function Footer() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin');
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -16,7 +20,7 @@ export function Footer() {
           
           {/* Brand Info */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <Link href="#home" className="flex items-center gap-2.5 mb-3 group">
+            <Link href={isAdmin ? '/' : '#home'} className="flex items-center gap-2.5 mb-3 group">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 p-[1.5px]">
                 <div className="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center">
                   <Code2 className="w-4 h-4 text-cyan-400" />
@@ -32,17 +36,25 @@ export function Footer() {
           </div>
 
           {/* Nav Quick Links */}
-          <div className="flex flex-wrap justify-center gap-6 text-xs font-mono text-slate-400">
-            <a href="#home" className="hover:text-cyan-400 transition-colors">Início</a>
-            <a href="#sobre" className="hover:text-cyan-400 transition-colors">Sobre</a>
-            <a href="#stacks" className="hover:text-cyan-400 transition-colors">Stacks</a>
-            <a href="#projetos" className="hover:text-cyan-400 transition-colors">Projetos</a>
-            <a href="#github" className="hover:text-cyan-400 transition-colors">GitHub Live</a>
-            <a href="#contato" className="hover:text-cyan-400 transition-colors">Contato</a>
-            <Link href="/admin" className="text-cyan-400 hover:underline flex items-center gap-1">
-              <Shield className="w-3 h-3" /> Painel Admin
-            </Link>
-          </div>
+          {!isAdmin ? (
+            <div className="flex flex-wrap justify-center gap-6 text-xs font-mono text-slate-400">
+              <a href="#home" className="hover:text-cyan-400 transition-colors">Início</a>
+              <a href="#sobre" className="hover:text-cyan-400 transition-colors">Sobre</a>
+              <a href="#stacks" className="hover:text-cyan-400 transition-colors">Stacks</a>
+              <a href="#projetos" className="hover:text-cyan-400 transition-colors">Projetos</a>
+              <a href="#github" className="hover:text-cyan-400 transition-colors">GitHub Live</a>
+              <a href="#contato" className="hover:text-cyan-400 transition-colors">Contato</a>
+              <Link href="/admin" className="text-cyan-400 hover:underline flex items-center gap-1">
+                <Shield className="w-3 h-3" /> Painel Admin
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-6 text-xs font-mono text-slate-400">
+              <Link href="/" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" /> Voltar ao Portfólio Público
+              </Link>
+            </div>
+          )}
 
           {/* Socials & Back to Top */}
           <div className="flex items-center gap-3">
