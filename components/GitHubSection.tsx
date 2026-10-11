@@ -13,6 +13,7 @@ import {
   Code2,
   Sparkles,
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface GitHubProfile {
   login: string;
@@ -37,6 +38,7 @@ interface GitHubRepo {
 }
 
 export function GitHubSection() {
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<GitHubProfile | null>(null);
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,13 +77,13 @@ export function GitHubSection() {
         <div className="flex flex-col items-center text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-3">
             <Activity className="w-3.5 h-3.5" />
-            <span>Integração em Tempo Real</span>
+            <span>{t.github.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            Atividade no <span className="text-gradient-cyan">GitHub</span>
+            {t.github.title} <span className="text-gradient-cyan">{t.github.titleHighlight}</span>
           </h2>
           <p className="mt-3 text-slate-400 max-w-2xl text-base sm:text-lg">
-            Acompanhe em tempo real meus commits, repositórios públicos e contribuições diretamente da API oficial do GitHub.
+            {t.github.subtitle}
           </p>
         </div>
 
@@ -107,7 +109,7 @@ export function GitHubSection() {
                   </span>
                 </h3>
                 <p className="text-sm text-slate-300 mt-1 max-w-xl">
-                  {profile?.bio || 'Engenheiro Full-Stack | Vibe Coding | Next.js | TypeScript | Node.js'}
+                  {profile?.bio || t.github.defaultBio}
                 </p>
               </div>
             </div>
@@ -119,7 +121,7 @@ export function GitHubSection() {
                   {profile?.public_repos ?? 18}
                 </div>
                 <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">
-                  Repositórios
+                  {t.github.metrics.repos}
                 </div>
               </div>
 
@@ -128,7 +130,7 @@ export function GitHubSection() {
                   {profile?.followers ?? 12}
                 </div>
                 <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">
-                  Seguidores
+                  {t.github.metrics.followers}
                 </div>
               </div>
 
@@ -139,7 +141,7 @@ export function GitHubSection() {
                 className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all"
               >
                 <Github className="w-4 h-4" />
-                <span>Perfil</span>
+                <span>{t.github.metrics.profile}</span>
               </a>
             </div>
 
@@ -166,7 +168,7 @@ export function GitHubSection() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-400 line-clamp-2 leading-relaxed mb-6">
-                  {repo.description || 'Repositório de código limpo com testes e boas práticas de arquitetura.'}
+                  {repo.description || t.github.defaultRepoDesc}
                 </p>
               </div>
 
@@ -205,7 +207,7 @@ export function GitHubSection() {
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-300 font-mono text-sm font-medium transition-all"
           >
             <Github className="w-4 h-4 text-cyan-400" />
-            <span>Ver todos os repositórios no GitHub</span>
+            <span>GitHub &bull; Repositories</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>

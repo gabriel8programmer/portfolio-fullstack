@@ -4,10 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Github, Linkedin, Shield, Code2, ArrowUp, ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export function Footer() {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin');
+  const { t } = useLanguage();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -31,27 +33,27 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-xs text-slate-400 max-w-sm">
-              Engenheiro Full-Stack & Vibe Coder. Construindo produtos digitais completos e modernos com Next.js, React, Node.js e Inteligência Artificial.
+              {t.footer.bio}
             </p>
           </div>
 
           {/* Nav Quick Links */}
           {!isAdmin ? (
             <div className="flex flex-wrap justify-center gap-6 text-xs font-mono text-slate-400">
-              <a href="#home" className="hover:text-cyan-400 transition-colors">Início</a>
-              <a href="#sobre" className="hover:text-cyan-400 transition-colors">Sobre</a>
-              <a href="#stacks" className="hover:text-cyan-400 transition-colors">Stacks</a>
-              <a href="#projetos" className="hover:text-cyan-400 transition-colors">Projetos</a>
-              <a href="#github" className="hover:text-cyan-400 transition-colors">GitHub Live</a>
-              <a href="#contato" className="hover:text-cyan-400 transition-colors">Contato</a>
+              <a href="#home" className="hover:text-cyan-400 transition-colors">{t.footer.nav.home}</a>
+              <a href="#sobre" className="hover:text-cyan-400 transition-colors">{t.footer.nav.about}</a>
+              <a href="#stacks" className="hover:text-cyan-400 transition-colors">{t.footer.nav.stacks}</a>
+              <a href="#projetos" className="hover:text-cyan-400 transition-colors">{t.footer.nav.projects}</a>
+              <a href="#github" className="hover:text-cyan-400 transition-colors">{t.footer.nav.github}</a>
+              <a href="#contato" className="hover:text-cyan-400 transition-colors">{t.footer.nav.contact}</a>
               <Link href="/admin" className="text-cyan-400 hover:underline flex items-center gap-1">
-                <Shield className="w-3 h-3" /> Painel Admin
+                <Shield className="w-3 h-3" /> {t.footer.nav.admin}
               </Link>
             </div>
           ) : (
             <div className="flex flex-wrap justify-center gap-6 text-xs font-mono text-slate-400">
               <Link href="/" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
-                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" /> Voltar ao Portfólio Público
+                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" /> {t.footer.backToPortfolio}
               </Link>
             </div>
           )}
@@ -78,8 +80,8 @@ export function Footer() {
             </a>
             <button
               onClick={scrollToTop}
-              title="Voltar ao topo"
-              aria-label="Voltar ao topo"
+              title={t.footer.scrollToTop}
+              aria-label={t.footer.scrollToTop}
               className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
             >
               <ArrowUp className="w-4 h-4" />
@@ -91,10 +93,10 @@ export function Footer() {
         {/* Copyright notice */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
-            &copy; {new Date().getFullYear()} Gabriel Pereira. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} {t.footer.copyright}
           </div>
           <div className="flex items-center gap-1.5 font-mono">
-            <span>Desenvolvido com Next.js, Tailwind CSS & Vibe Coding</span>
+            <span>{t.footer.builtWith}</span>
           </div>
         </div>
       </div>

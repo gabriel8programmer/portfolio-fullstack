@@ -5,8 +5,10 @@ import Image from 'next/image';
 import { StackItem, StackCategory } from '@/types';
 import { initialPortfolioData } from '@/lib/default-data';
 import { Search, Sparkles, Layers, Cpu, Database, Wrench, Globe, Filter } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { initialStacks?: StackItem[] }) {
+  const { t, language } = useLanguage();
   const [stacks, setStacks] = useState<StackItem[]>(initialStacks);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -29,12 +31,12 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
   }, []);
 
   const categories = [
-    { id: 'all', label: 'Todas as Stacks', icon: Layers },
-    { id: 'frontend', label: 'Frontend & Vibe', icon: Sparkles },
-    { id: 'backend', label: 'Back-end & APIs', icon: Cpu },
-    { id: 'languages', label: 'Linguagens', icon: Globe },
-    { id: 'database', label: 'Banco de Dados', icon: Database },
-    { id: 'devops', label: 'DevOps & Tooling', icon: Wrench },
+    { id: 'all', label: t.stacks.categories.all, icon: Layers },
+    { id: 'frontend', label: t.stacks.categories.frontend, icon: Sparkles },
+    { id: 'backend', label: t.stacks.categories.backend, icon: Cpu },
+    { id: 'languages', label: t.stacks.categories.languages, icon: Globe },
+    { id: 'database', label: t.stacks.categories.database, icon: Database },
+    { id: 'devops', label: t.stacks.categories.devops, icon: Wrench },
   ];
 
   const filteredStacks = stacks.filter((stack) => {
@@ -56,6 +58,11 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
     }
   };
 
+  const getLevelLabel = (level: string) => {
+    const badgeKey = level as keyof typeof t.stacks.levelBadges;
+    return t.stacks.levelBadges[badgeKey] || level;
+  };
+
   return (
     <section id="stacks" className="py-24 relative overflow-hidden bg-[#090d16]/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -64,13 +71,13 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
         <div className="flex flex-col items-center text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Ecossistema Full-Stack & Vibe Coding</span>
+            <span>{t.stacks.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            Stacks & <span className="text-gradient-cyan">Habilidades Full-Stack</span>
+            {t.stacks.title} <span className="text-gradient-cyan">{t.stacks.titleHighlight}</span>
           </h2>
           <p className="mt-3 text-slate-400 max-w-2xl text-base sm:text-lg">
-            Tecnologias que domino para criar experiências completas de software — desde o design do frontend até a persistência e escalabilidade no backend.
+            {t.stacks.subtitle}
           </p>
         </div>
 
@@ -111,7 +118,7 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar tecnologia..."
+              placeholder={t.stacks.searchPlaceholder}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all"
             />
           </div>
@@ -141,7 +148,6 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
                     className="w-7 h-7 object-contain filter group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all"
                     loading="lazy"
                     onError={(e) => {
-                      // Fallback text if icon doesn't exist
                       (e.target as HTMLElement).style.display = 'none';
                     }}
                   />
@@ -154,7 +160,7 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
 
                 {/* Level Badge */}
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${getLevelBadgeClass(stack.level)}`}>
-                  {stack.level}
+                  {getLevelLabel(stack.level)}
                 </span>
               </div>
             );
@@ -163,7 +169,7 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
 
         {filteredStacks.length === 0 && (
           <div className="py-16 text-center text-slate-400">
-            <p className="text-lg">Nenhuma stack encontrada para a busca &quot;{searchQuery}&quot;</p>
+            <p className="text-lg">{t.stacks.emptySearch} &quot;{searchQuery}&quot;</p>
             <button
               onClick={() => {
                 setSearchQuery('');
@@ -171,7 +177,7 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
               }}
               className="mt-3 text-cyan-400 hover:underline text-sm font-medium"
             >
-              Limpar filtros
+              {t.stacks.clearFilters}
             </button>
           </div>
         )}
@@ -187,13 +193,13 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
               </div>
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                  Vibe Coding & AI-Driven Workflow
+                  {t.stacks.banner.title}
                   <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">
-                    High Velocity
+                    {t.stacks.banner.tag}
                   </span>
                 </h3>
                 <p className="text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                  Adoto ferramentas modernas de Inteligência Artificial combinadas com engenharia rigorosa de software para acelerar prototipagem, automação de testes e entrega contínua com máxima qualidade e assertividade.
+                  {t.stacks.banner.description}
                 </p>
               </div>
             </div>
@@ -202,7 +208,7 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
               href="#projetos"
               className="flex-shrink-0 px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider transition-all"
             >
-              Ver Resultados
+              {language === 'en' ? 'View Projects' : 'Ver Resultados'}
             </a>
           </div>
         </div>

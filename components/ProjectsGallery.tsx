@@ -16,8 +16,10 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Modal } from '@/components/Modal';
+import { useLanguage } from '@/context/LanguageContext';
 
 export function ProjectsGallery({ initialProjects = initialPortfolioData.projects }: { initialProjects?: Project[] }) {
+  const { t, language } = useLanguage();
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
@@ -39,11 +41,34 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
     loadProjects();
   }, []);
 
+  const getProjectTagline = (project: Project) => {
+    if (language === 'en') {
+      const defaultTranslation = t.projects.defaults[project.id as keyof typeof t.projects.defaults]?.tagline;
+      return project.taglineEn || defaultTranslation || project.tagline;
+    }
+    return project.tagline;
+  };
+
+  const getProjectDescription = (project: Project) => {
+    if (language === 'en') {
+      const defaultTranslation = t.projects.defaults[project.id as keyof typeof t.projects.defaults]?.description;
+      return project.descriptionEn || defaultTranslation || project.description;
+    }
+    return project.description;
+  };
+
   const filteredProjects = projects.filter((proj) => {
     if (selectedFilter === 'all') return true;
     if (selectedFilter === 'featured') return proj.featured;
     return proj.category === selectedFilter;
   });
+
+  const filterTabs = [
+    { id: 'all', label: t.projects.filters.all },
+    { id: 'featured', label: t.projects.filters.featured },
+    { id: 'fullstack', label: t.projects.filters.fullstack },
+    { id: 'backend', label: t.projects.filters.backend },
+  ];
 
   return (
     <section id="projetos" className="py-24 relative overflow-hidden">
@@ -53,25 +78,20 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
         <div className="flex flex-col items-center text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-3">
             <FolderGit2 className="w-3.5 h-3.5" />
-            <span>Aplicações & Produtos Digitais</span>
+            <span>{t.projects.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            Projetos <span className="text-gradient-cyan">Full-Stack & APIs</span>
+            {t.projects.title} <span className="text-gradient-cyan">{t.projects.titleHighlight}</span>
           </h2>
           <p className="mt-3 text-slate-400 max-w-2xl text-base sm:text-lg">
-            Soluções completas desenvolvidas com arquitetura limpa, interfaces reativas, segurança e alta performance de ponta a ponta.
+            {t.projects.subtitle}
           </p>
         </div>
 
         {/* Filter Tabs */}
         <div className="flex justify-center mb-12">
           <div className="inline-flex p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md gap-1">
-            {[
-              { id: 'all', label: 'Todos os Projetos' },
-              { id: 'featured', label: '⭐ Destaques' },
-              { id: 'fullstack', label: 'Full-Stack' },
-              { id: 'backend', label: 'Back-end & APIs' },
-            ].map((tab) => (
+            {filterTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setSelectedFilter(tab.id)}
@@ -116,8 +136,8 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
 
                   {project.featured && (
                     <span className="px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/50 backdrop-blur-md text-[11px] font-mono text-cyan-300 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-cyan-400" />
-                      Destaque
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      {t.projects.card.featured}
                     </span>
                   )}
                 </div>
@@ -125,7 +145,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                 {/* Overlay hover prompt */}
                 <div className="absolute inset-0 bg-cyan-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                   <span className="px-4 py-2 rounded-xl bg-slate-900 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 shadow-xl border border-cyan-500/40">
-                    Ver Detalhes do Projeto <ArrowUpRight className="w-3.5 h-3.5" />
+                    {t.projects.card.viewDetails} <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>
@@ -137,7 +157,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                 </h3>
 
                 <p className="text-sm text-slate-300 line-clamp-3 mb-5 leading-relaxed">
-                  {project.tagline || project.description}
+                  {getProjectTagline(project) || getProjectDescription(project)}
                 </p>
 
                 {/* Tech Pills */}
@@ -166,7 +186,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                     className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-700 hover:border-cyan-500/40 transition-all"
                   >
                     <Github className="w-4 h-4 text-cyan-400" />
-                    <span>Repositório</span>
+                    <span>{t.projects.card.repository}</span>
                   </a>
 
                   {project.liveUrl ? (
@@ -177,7 +197,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                       className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20 transition-all"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      <span>Deploy</span>
+                      <span>{t.projects.card.deploy}</span>
                     </a>
                   ) : (
                     <button
@@ -185,7 +205,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                       className="w-full py-2.5 rounded-xl bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-1.5 border border-cyan-500/30 transition-all"
                     >
                       <Code className="w-4 h-4" />
-                      <span>Arquitetura</span>
+                      <span>{t.projects.card.architecture}</span>
                     </button>
                   )}
                 </div>
@@ -196,7 +216,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
 
         {filteredProjects.length === 0 && (
           <div className="py-16 text-center text-slate-400">
-            <p className="text-lg">Nenhum projeto encontrado nesta categoria.</p>
+            <p className="text-lg">{t.projects.emptyState}</p>
           </div>
         )}
 
@@ -227,7 +247,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
               </span>
               {activeModalProject.featured && (
                 <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" /> Projeto Destaque
+                  <Sparkles className="w-3.5 h-3.5" /> {t.projects.modal.featuredBadge}
                 </span>
               )}
             </div>
@@ -238,22 +258,22 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
 
             {/* Full description */}
             <div className="text-slate-300 text-sm sm:text-base space-y-4 mb-6 leading-relaxed">
-              <p>{activeModalProject.description}</p>
+              <p>{getProjectDescription(activeModalProject)}</p>
             </div>
 
             {/* Technologies List */}
             <div className="mb-8">
               <h4 className="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-3 flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5" />
-                Tecnologias Utilizadas
+                {t.projects.modal.techHeading}
               </h4>
               <div className="flex flex-wrap gap-2">
-                {activeModalProject.technologies.map((t, i) => (
+                {activeModalProject.technologies.map((tech, i) => (
                   <span
                     key={i}
                     className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-slate-200"
                   >
-                    {t}
+                    {tech}
                   </span>
                 ))}
               </div>
@@ -268,7 +288,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                 className="flex-1 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-cyan-400 text-slate-200 font-semibold text-sm flex items-center justify-center gap-2 transition-all"
               >
                 <Github className="w-4 h-4 text-cyan-400" />
-                <span>Ver Código no GitHub</span>
+                <span>{t.projects.modal.viewCode}</span>
               </a>
 
               {activeModalProject.liveUrl && (
@@ -279,7 +299,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                   className="flex-1 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 transition-all"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  <span>Acessar Deploy</span>
+                  <span>{t.projects.modal.openDeploy}</span>
                 </a>
               )}
             </div>

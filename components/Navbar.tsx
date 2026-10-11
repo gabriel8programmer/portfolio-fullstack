@@ -4,10 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Shield, Github, Linkedin, Code2, ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { LanguageSwitch } from '@/components/LanguageSwitch';
 
 export function Navbar() {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin');
+  const { t } = useLanguage();
 
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -40,12 +43,12 @@ export function Navbar() {
   }, [isAdmin]);
 
   const navLinks = [
-    { label: 'Início', href: '#home', id: 'home' },
-    { label: 'Sobre', href: '#sobre', id: 'sobre' },
-    { label: 'Stacks & Vibe', href: '#stacks', id: 'stacks' },
-    { label: 'Projetos', href: '#projetos', id: 'projetos' },
-    { label: 'GitHub Live', href: '#github', id: 'github' },
-    { label: 'Contato', href: '#contato', id: 'contato' },
+    { label: t.navbar.nav.home, href: '#home', id: 'home' },
+    { label: t.navbar.nav.about, href: '#sobre', id: 'sobre' },
+    { label: t.navbar.nav.stacks, href: '#stacks', id: 'stacks' },
+    { label: t.navbar.nav.projects, href: '#projetos', id: 'projetos' },
+    { label: t.navbar.nav.github, href: '#github', id: 'github' },
+    { label: t.navbar.nav.contact, href: '#contato', id: 'contato' },
   ];
 
   return (
@@ -76,7 +79,7 @@ export function Navbar() {
               )}
             </div>
             <span className="text-[10px] tracking-widest text-slate-400 uppercase font-mono">
-              {isAdmin ? 'Painel Administrativo' : 'Full-Stack & Vibe Coding'}
+              {isAdmin ? t.navbar.adminSub : t.navbar.brandSub}
             </span>
           </div>
         </Link>
@@ -101,13 +104,16 @@ export function Navbar() {
               ))}
             </nav>
 
-            {/* Action icons (Social + Admin portal) */}
+            {/* Action cluster (Language Switch + Social + Admin portal) */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Language Switch */}
+              <LanguageSwitch />
+
               <a
                 href="https://github.com/gabriel8programmer"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="GitHub de Gabriel"
+                title="GitHub"
                 aria-label="Perfil no GitHub"
                 className="w-9 h-9 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
               >
@@ -117,7 +123,7 @@ export function Navbar() {
                 href="https://www.linkedin.com/in/gabrielwebprogrammer"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="LinkedIn de Gabriel"
+                title="LinkedIn"
                 aria-label="Perfil no LinkedIn"
                 className="w-9 h-9 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all"
               >
@@ -125,27 +131,29 @@ export function Navbar() {
               </a>
               <Link
                 href="/admin"
-                title="Painel Administrativo"
+                title={t.navbar.adminSub}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all group"
               >
                 <Shield className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
-                <span>Admin</span>
+                <span>{t.navbar.adminButton}</span>
               </Link>
             </div>
 
             {/* Mobile menu trigger */}
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-2 md:hidden">
+              <LanguageSwitch size="sm" />
+
               <Link
                 href="/admin"
-                title="Painel Administrativo"
-                aria-label="Painel Administrativo"
+                title={t.navbar.adminSub}
+                aria-label={t.navbar.adminSub}
                 className="w-9 h-9 rounded-lg bg-slate-900/70 border border-cyan-500/30 flex items-center justify-center text-cyan-400"
               >
                 <Shield className="w-4 h-4" />
               </Link>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                aria-label={isOpen ? 'Fechar Menu' : 'Abrir Menu'}
+                aria-label={isOpen ? t.navbar.closeMenu : t.navbar.openMenu}
                 className="w-10 h-10 rounded-lg bg-slate-900/80 border border-slate-800 flex items-center justify-center text-slate-200 hover:text-cyan-400 transition-colors"
               >
                 {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -153,15 +161,16 @@ export function Navbar() {
             </div>
           </>
         ) : (
-          /* Focused Admin Navigation: Clean Return Button */
+          /* Focused Admin Navigation: Clean Return Button & Language Switch */
           <div className="flex items-center gap-3">
+            <LanguageSwitch size="sm" />
             <Link
               href="/"
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-xs font-mono text-slate-300 hover:text-cyan-300 transition-all shadow-sm"
-              title="Voltar ao Portfólio Público"
+              title={t.navbar.backToPortfolio}
             >
               <ArrowLeft className="w-4 h-4 text-cyan-400" />
-              <span>Voltar ao Portfólio</span>
+              <span>{t.navbar.backToPortfolio}</span>
             </Link>
           </div>
         )}
@@ -170,6 +179,13 @@ export function Navbar() {
       {/* Mobile Drawer Menu (only for public portfolio, not in admin) */}
       {!isAdmin && isOpen && (
         <div className="lg:hidden fixed inset-x-0 top-[70px] bg-[#090d16]/95 backdrop-blur-xl border-b border-cyan-500/20 p-6 flex flex-col gap-4 shadow-2xl animate-in slide-in-from-top duration-300">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
+              {t.navbar.nav.about}:
+            </span>
+            <LanguageSwitch size="sm" />
+          </div>
+
           <nav className="flex flex-col gap-2">
             {navLinks.map((link) => (
               <a
@@ -213,7 +229,7 @@ export function Navbar() {
               className="px-4 py-2 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-sm font-mono text-cyan-300 flex items-center gap-2"
             >
               <Shield className="w-4 h-4" />
-              Painel Admin
+              {t.navbar.adminSub}
             </Link>
           </div>
         </div>

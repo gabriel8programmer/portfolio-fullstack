@@ -15,8 +15,10 @@ import {
   MapPin,
   Clock,
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export function ContactSection() {
+  const { t } = useLanguage();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -45,7 +47,7 @@ export function ContactSection() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Falha ao enviar mensagem');
+        throw new Error(data.error || t.contact.form.errorMessageDefault);
       }
 
       setStatus('success');
@@ -53,7 +55,7 @@ export function ContactSection() {
       setTimeout(() => setStatus('idle'), 6000);
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err.message || 'Erro inesperado. Tente novamente.');
+      setErrorMessage(err.message || t.contact.form.errorMessageDefault);
     }
   };
 
@@ -65,13 +67,13 @@ export function ContactSection() {
         <div className="flex flex-col items-center text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-3">
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Vamos Conversar</span>
+            <span>{t.contact.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            Entre em <span className="text-gradient-cyan">Contato</span>
+            {t.contact.title} <span className="text-gradient-cyan">{t.contact.titleHighlight}</span>
           </h2>
           <p className="mt-3 text-slate-400 max-w-2xl text-base sm:text-lg">
-            Tem uma oportunidade profissional, projeto ou dúvida técnica? Envie uma mensagem e vamos construir algo incrível juntos!
+            {t.contact.subtitle}
           </p>
         </div>
 
@@ -81,10 +83,10 @@ export function ContactSection() {
           <div className="lg:col-span-5 flex flex-col justify-between gap-6">
             <div className="space-y-4">
               <h3 className="text-2xl font-bold text-white mb-2">
-                Conecte-se comigo
+                {t.contact.info.title}
               </h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                Estou aberto para oportunidades como engenheiro full-stack, projetos inovadores com vibe coding e soluções digitais de alto impacto. Respondo com rapidez!
+                {t.contact.info.description}
               </p>
 
               {/* Direct email card with copy button */}
@@ -94,7 +96,7 @@ export function ContactSection() {
                     <Mail className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-mono text-slate-400 uppercase tracking-wider">E-mail Profissional</div>
+                    <div className="text-xs font-mono text-slate-400 uppercase tracking-wider">{t.contact.info.emailLabel}</div>
                     <div className="text-sm font-semibold text-slate-200 truncate">{contactEmail}</div>
                   </div>
                 </div>
@@ -102,7 +104,7 @@ export function ContactSection() {
                 <button
                   onClick={handleCopyEmail}
                   className="p-2 rounded-xl bg-slate-800 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 border border-slate-700 hover:border-cyan-500/40 transition-all flex-shrink-0"
-                  title="Copiar e-mail"
+                  title={copiedEmail ? t.contact.info.emailCopied : t.contact.info.copyEmail}
                 >
                   {copiedEmail ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -126,7 +128,7 @@ export function ContactSection() {
                     </div>
                   </div>
                 </div>
-                <span className="text-xs font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">Visitar &rarr;</span>
+                <span className="text-xs font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">{t.contact.info.visit} &rarr;</span>
               </a>
 
               {/* GitHub */}
@@ -147,7 +149,7 @@ export function ContactSection() {
                     </div>
                   </div>
                 </div>
-                <span className="text-xs font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">Visitar &rarr;</span>
+                <span className="text-xs font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">{t.contact.info.visit} &rarr;</span>
               </a>
             </div>
 
@@ -155,7 +157,7 @@ export function ContactSection() {
             <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center gap-3">
               <Clock className="w-5 h-5 text-emerald-400 flex-shrink-0" />
               <div className="text-xs text-emerald-300 leading-relaxed font-mono">
-                Horário de resposta habitual: menos de 24 horas. Fuso horário de Brasília (UTC-3).
+                {t.contact.info.availability}
               </div>
             </div>
           </div>
@@ -164,51 +166,51 @@ export function ContactSection() {
           <div className="lg:col-span-7">
             <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-xl shadow-2xl relative">
               <h3 className="text-2xl font-bold text-white mb-2">
-                Envie uma mensagem direta
+                {t.contact.form.title}
               </h3>
               <p className="text-sm text-slate-400 mb-8">
-                Preencha os dados abaixo. Sua mensagem será entregue imediatamente no meu painel administrativo.
+                {t.contact.form.subtitle}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">
-                    Seu Nome Completo
+                    {t.contact.form.nameLabel}
                   </label>
                   <input
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Ex: Ana Silva"
+                    placeholder={t.contact.form.namePlaceholder}
                     className="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">
-                    Seu E-mail Profissional
+                    {t.contact.form.emailLabel}
                   </label>
                   <input
                     type="email"
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="Ex: ana.silva@empresa.com"
+                    placeholder={t.contact.form.emailPlaceholder}
                     className="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">
-                    Mensagem / Proposta
+                    {t.contact.form.messageLabel}
                   </label>
                   <textarea
                     required
                     rows={4}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    placeholder="Olá Gabriel! Gostaria de conversar sobre uma oportunidade de trabalho / projeto..."
+                    placeholder={t.contact.form.messagePlaceholder}
                     className="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none"
                   />
                 </div>
@@ -216,7 +218,7 @@ export function ContactSection() {
                 {status === 'success' && (
                   <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/50 text-emerald-300 text-sm flex items-center gap-3 animate-in fade-in">
                     <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-400" />
-                    <span>Mensagem enviada com sucesso! Obrigado pelo contato, responderei em breve.</span>
+                    <span>{t.contact.form.successMessage}</span>
                   </div>
                 )}
 
@@ -236,7 +238,7 @@ export function ContactSection() {
                     <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
                   ) : (
                     <>
-                      <span>Enviar Mensagem</span>
+                      <span>{t.contact.form.submitButton}</span>
                       <Send className="w-4 h-4" />
                     </>
                   )}

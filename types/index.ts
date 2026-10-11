@@ -2,7 +2,9 @@ export interface Project {
   id: string;
   title: string;
   tagline: string;
+  taglineEn?: string;
   description: string;
+  descriptionEn?: string;
   category: 'backend' | 'fullstack' | 'api' | 'devops' | 'database';
   image: string;
   githubUrl: string;

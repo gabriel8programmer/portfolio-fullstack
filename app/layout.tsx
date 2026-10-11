@@ -3,6 +3,7 @@ import './globals.css';
 import { InteractiveBackground } from '@/components/InteractiveBackground';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://gabrielpereira.dev'),
@@ -114,10 +115,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col relative selection:bg-cyan-500/30 selection:text-cyan-200">
-        <InteractiveBackground />
-        <Navbar />
-        <main className="flex-grow z-10">{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <InteractiveBackground />
+          <Navbar />
+          <main className="flex-grow z-10">{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

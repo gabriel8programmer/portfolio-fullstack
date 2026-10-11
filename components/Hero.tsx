@@ -14,24 +14,21 @@ import {
   Check,
   Zap,
 } from 'lucide-react';
-
-const roles = [
-  'Engenheiro de Software Full-Stack',
-  'Especialista em Vibe Coding & IA',
-  'Arquiteto Next.js, React & Node.js',
-  'Construção de Produtos End-to-End',
-];
+import { useLanguage } from '@/context/LanguageContext';
 
 export function Hero() {
+  const { t, language } = useLanguage();
   const [roleIndex, setRoleIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+
+  const roles = t.hero.roles;
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);
     }, 3200);
     return () => clearInterval(interval);
-  }, []);
+  }, [roles.length]);
 
   const codeSnippet = `// ⚡ Vibe Coding: Full-Stack Server Action with Next.js & AI
 'use server';
@@ -65,13 +62,13 @@ export async function createProjectAction(data: ProjectInput) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
               </span>
-              <span>Disponível para Projetos Full-Stack & Vibe Coding</span>
+              <span>{t.hero.statusBadge}</span>
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
             </div>
 
             {/* Main Greeting and Title */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-              Olá, eu sou{' '}
+              {t.hero.greeting}{' '}
               <span className="text-gradient-cyan block mt-1 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]">
                 Gabriel Pereira
               </span>
@@ -82,7 +79,7 @@ export async function createProjectAction(data: ProjectInput) {
               <span className="text-lg sm:text-xl md:text-2xl font-mono text-cyan-300/90 font-medium">
                 {`> `}
                 <span className="border-b-2 border-cyan-400 pb-0.5">
-                  {roles[roleIndex]}
+                  {roles[roleIndex % roles.length]}
                 </span>
                 <span className="animate-pulse">_</span>
               </span>
@@ -90,7 +87,14 @@ export async function createProjectAction(data: ProjectInput) {
 
             {/* Elevator Pitch */}
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mb-8 leading-relaxed">
-              <strong className="text-white">Engenheiro de Software Full-Stack</strong> pioneiro na cultura de <span className="text-cyan-300 font-medium">Vibe Coding</span>. Desenvolvo produtos digitais completos de ponta a ponta — unindo interfaces modernas, fluidas e reativas em <strong className="text-white">Next.js e React</strong> a arquiteturas resilientes e de alta velocidade com <strong className="text-white">Node.js, TypeScript, PostgreSQL e Docker</strong>.
+              <strong className="text-white">{t.hero.elevatorPitch.role}</strong>
+              {t.hero.elevatorPitch.descriptionPart1}
+              <span className="text-cyan-300 font-medium">{t.hero.elevatorPitch.vibeCoding}</span>
+              {t.hero.elevatorPitch.descriptionPart2}
+              <strong className="text-white">{t.hero.elevatorPitch.frontendTech}</strong>
+              {t.hero.elevatorPitch.descriptionPart3}
+              <strong className="text-white">{t.hero.elevatorPitch.backendTech}</strong>
+              {t.hero.elevatorPitch.descriptionPart4}
             </p>
 
             {/* CTAs */}
@@ -99,18 +103,22 @@ export async function createProjectAction(data: ProjectInput) {
                 href="#projetos"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
-                <span>Ver Meus Projetos</span>
+                <span>{t.hero.buttons.viewProjects}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
               <a
-                href="https://drive.google.com/file/d/1dkyxCEjt9OFXgPSpN4K9pS0WJEV6sgMc/view?usp=sharing"
+                href={
+                  language === 'en'
+                    ? '/curriculos/curriculo_en.html'
+                    : 'https://drive.google.com/file/d/1dkyxCEjt9OFXgPSpN4K9pS0WJEV6sgMc/view?usp=sharing'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800/80 border border-slate-700 hover:border-cyan-500/50 text-slate-200 font-semibold text-sm flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
               >
                 <Download className="w-4 h-4 text-cyan-400" />
-                <span>Baixar Currículo</span>
+                <span>{t.hero.buttons.downloadResume}</span>
               </a>
 
               <a
@@ -118,23 +126,23 @@ export async function createProjectAction(data: ProjectInput) {
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-950/60 hover:bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-sm font-medium flex items-center justify-center gap-2 transition-all"
               >
                 <Zap className="w-4 h-4 text-amber-400" />
-                <span>Entrar em Contato</span>
+                <span>{t.hero.buttons.contactMe}</span>
               </a>
             </div>
 
             {/* Quick Metrics */}
             <div className="grid grid-cols-3 gap-4 pt-10 mt-6 border-t border-slate-800/80 w-full max-w-xl">
               <div>
-                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">Full-Stack</div>
-                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">End-to-End</div>
+                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">{t.hero.metrics.fullstack.title}</div>
+                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">{t.hero.metrics.fullstack.sub}</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">Vibe Coding</div>
-                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Fluxo Ágil + IA</div>
+                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">{t.hero.metrics.vibeCoding.title}</div>
+                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">{t.hero.metrics.vibeCoding.sub}</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">100%</div>
-                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Tipado & Testado</div>
+                <div className="text-2xl sm:text-3xl font-bold font-mono text-cyan-400">{t.hero.metrics.testing.title}</div>
+                <div className="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">{t.hero.metrics.testing.sub}</div>
               </div>
             </div>
           </div>
@@ -155,14 +163,14 @@ export async function createProjectAction(data: ProjectInput) {
                     <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
                     <span className="ml-2 text-xs font-mono text-slate-400 flex items-center gap-1.5">
                       <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                      action.fullstack.ts
+                      {t.hero.terminal.filename}
                     </span>
                   </div>
 
                   <button
                     onClick={handleCopyCode}
-                    title="Copiar código"
-                    aria-label="Copiar código"
+                    title={t.hero.terminal.copy}
+                    aria-label={t.hero.terminal.copy}
                     className="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition-colors"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -172,7 +180,7 @@ export async function createProjectAction(data: ProjectInput) {
                 {/* Code Window */}
                 <div className="p-5 font-mono text-xs sm:text-sm text-slate-300 leading-relaxed overflow-x-auto">
                   <pre className="text-slate-300">
-                    <span className="text-slate-500">{`// ⚡ Vibe Coding: Full-Stack Action & AI`}</span>
+                    <span className="text-slate-500">{t.hero.terminal.comment}</span>
                     {'\n'}
                     <span className="text-cyan-300">&apos;use server&apos;</span>;{'\n'}
                     <span className="text-purple-400">import</span> {'{ db }'} <span className="text-purple-400">from</span> <span className="text-emerald-300">&apos;@/lib/db&apos;</span>;{'\n'}
@@ -197,7 +205,7 @@ export async function createProjectAction(data: ProjectInput) {
                     </span>
                   </div>
                   <span className="text-emerald-400 flex items-center gap-1">
-                    <Layers className="w-3 h-3" /> Full-Stack Ready
+                    <Layers className="w-3 h-3" /> {t.hero.terminal.status}
                   </span>
                 </div>
               </div>

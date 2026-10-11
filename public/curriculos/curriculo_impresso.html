@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gabriel Pereira dos Santos - Desenvolvedor Full-Stack (Versão Impressa)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    @page {
+      size: A4;
+      margin: 11mm 13mm 10mm 13mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #0f172a;
+      background-color: #ffffff;
+      line-height: 1.36;
+      font-size: 8.9pt;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 9px;
+      margin-bottom: 11px;
+    }
+
+    .name {
+      font-size: 19pt;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      color: #000000;
+      text-transform: uppercase;
+    }
+
+    .title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .subtitle {
+      font-size: 8.5pt;
+      color: #475569;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    .contact-container {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5px;
+      align-items: center;
+    }
+
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      font-size: 8.3pt;
+      color: #1e293b;
+    }
+
+    .contact-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .divider {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    /* SECTIONS */
+    .section {
+      margin-bottom: 11px;
+    }
+
+    .section-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #000000;
+      border-bottom: 1.5px solid #cbd5e1;
+      padding-bottom: 2.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title-bar {
+      width: 4px;
+      height: 11px;
+      background-color: #0f172a;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .summary-text {
+      text-align: justify;
+      color: #1e293b;
+      font-size: 8.7pt;
+      line-height: 1.40;
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      font-size: 8.4pt;
+    }
+
+    .skill-category {
+      color: #1e293b;
+      line-height: 1.34;
+    }
+
+    .skill-category strong {
+      color: #000000;
+      font-weight: 700;
+    }
+
+    /* PROJECTS */
+    .project-item {
+      margin-bottom: 8.5px;
+    }
+
+    .project-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .project-title {
+      font-size: 9.4pt;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .project-link {
+      font-size: 7.9pt;
+      color: #334155;
+      font-family: monospace;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .project-badges {
+      margin-bottom: 3px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .badge {
+      font-size: 7.4pt;
+      font-weight: 600;
+      color: #334155;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .project-desc {
+      font-size: 8.4pt;
+      color: #334155;
+      font-style: italic;
+      margin-bottom: 2.5px;
+      line-height: 1.3;
+    }
+
+    .project-bullets {
+      list-style-type: none;
+      margin-left: 2px;
+      font-size: 8.35pt;
+      color: #1e293b;
+      line-height: 1.32;
+    }
+
+    .project-bullets li {
+      position: relative;
+      padding-left: 12px;
+      margin-bottom: 1.5px;
+    }
+
+    .project-bullets li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: #0f172a;
+      font-weight: bold;
+    }
+
+    /* TWO COLUMNS: ACADEMIC & CERTIFICATIONS */
+    .edu-cert-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .edu-content {
+      font-size: 8.4pt;
+    }
+
+    .edu-title {
+      font-weight: 700;
+      font-size: 8.8pt;
+      color: #000000;
+    }
+
+    .edu-institution {
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 1px;
+    }
+
+    .edu-date {
+      font-size: 8pt;
+      color: #475569;
+      margin-top: 1px;
+    }
+
+    .edu-desc {
+      font-size: 8.1pt;
+      color: #334155;
+      margin-top: 3.5px;
+      line-height: 1.32;
+    }
+
+    .cert-bullets {
+      list-style-type: none;
+      font-size: 8.15pt;
+      color: #1e293b;
+      line-height: 1.32;
+    }
+
+    .cert-bullets li {
+      position: relative;
+      padding-left: 11px;
+      margin-bottom: 1.5px;
+    }
+
+    .cert-bullets li::before {
+      content: "•";
+      position: absolute;
+      left: 1px;
+      color: #0f172a;
+      font-weight: bold;
+    }
+
+    /* FOOTER */
+    .footer-bar {
+      border-top: 1.5px solid #cbd5e1;
+      padding-top: 6px;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8.3pt;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1 class="name">Gabriel Pereira dos Santos</h1>
+    <div class="title">Desenvolvedor de Software Full-Stack</div>
+    <div class="subtitle">Next.js • React • Node.js • TypeScript • Fastify • PostgreSQL • Docker • Vibe Coding</div>
+    
+    <div class="contact-container">
+      <div class="contact-row">
+        <span class="contact-item">Planaltina – GO</span>
+        <span class="divider">•</span>
+        <span class="contact-item">Tel: (61) 99581-5904 / (61) 99558-0396</span>
+        <span class="divider">•</span>
+        <span class="contact-item">Email: gabriel8webprogrammer@gmail.com</span>
+      </div>
+
+      <div class="contact-row">
+        <span class="contact-item">LinkedIn: linkedin.com/in/gabrielwebprogrammer</span>
+        <span class="divider">•</span>
+        <span class="contact-item">GitHub: github.com/gabriel8programmer</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- RESUMO PROFISSIONAL -->
+  <section class="section">
+    <h2 class="section-title"><span class="section-title-bar"></span>Resumo Profissional</h2>
+    <p class="summary-text">
+      Desenvolvedor de Software Full-Stack graduado em Análise e Desenvolvimento de Sistemas (UNIP), com foco na construção de produtos digitais modernos e escaláveis de ponta a ponta (end-to-end). Especializado no desenvolvimento de interfaces reativas, acessíveis e de alta fidelidade com <strong>Next.js 14, React e Tailwind CSS</strong>, integradas a arquiteturas de backend resilientes, de alta taxa de vazão e seguras com <strong>Node.js, Fastify, Express, TypeScript, PostgreSQL e MongoDB</strong>. Ampla vivência em modelagem relacional com Prisma ORM, suíte de testes com Jest e conteinerização em Docker. Praticante ativo da cultura de <strong>Vibe Coding</strong> assistido por ferramentas de IA, combinando agilidade extrema com Clean Code, princípios SOLID e entrega de alto impacto técnico.
+    </p>
+  </section>
+
+  <!-- HABILIDADES TÉCNICAS -->
+  <section class="section">
+    <h2 class="section-title"><span class="section-title-bar"></span>Habilidades Técnicas</h2>
+    <div class="skills-grid">
+      <div class="skill-category">
+        <strong>Front-end:</strong> Next.js 14 (App Router, SSR/SSG), React, TypeScript, Tailwind CSS, HTML5, CSS3, UI Reativa & UX
+      </div>
+      <div class="skill-category">
+        <strong>Back-end:</strong> Node.js, Fastify, Express.js, NestJS, APIs RESTful, Middleware, JWT, OAuth, Bcrypt, Webhooks
+      </div>
+      <div class="skill-category">
+        <strong>Bancos de Dados & ORMs:</strong> PostgreSQL, MongoDB, Prisma ORM, Mongoose, MySQL, Modelagem Relacional & NoSQL
+      </div>
+      <div class="skill-category">
+        <strong>DevOps & Testes:</strong> Docker & Docker Compose, Jest, Supertest, Git, GitHub, Swagger / OpenAPI, Postman, Insomnia
+      </div>
+      <div class="skill-category" style="grid-column: span 2;">
+        <strong>Arquitetura & Metodologias:</strong> Clean Code, Princípios SOLID, MVC, Microserviços, Vibe Coding & Engenharia com IA
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETOS EM DESTAQUE -->
+  <section class="section">
+    <h2 class="section-title"><span class="section-title-bar"></span>Projetos em Destaque</h2>
+
+    <!-- Rentals Platform -->
+    <div class="project-item">
+      <div class="project-top-row">
+        <span class="project-title">Rentals Platform & API</span>
+        <span class="project-link">github.com/gabriel8programmer/rentals-api</span>
+      </div>
+      <div class="project-badges">
+        <span class="badge">Next.js</span>
+        <span class="badge">Fastify</span>
+        <span class="badge">PostgreSQL</span>
+        <span class="badge">Prisma ORM</span>
+        <span class="badge">Docker</span>
+        <span class="badge">Swagger</span>
+        <span class="badge">Jest</span>
+      </div>
+      <div class="project-desc">Plataforma de alta performance para gerenciamento e reservas de locações em tempo real.</div>
+      <ul class="project-bullets">
+        <li>Desenvolveu API RESTful com <strong>Fastify</strong> focada em altíssimo throughput e validação rígida de esquemas via JSON Schema.</li>
+        <li>Modelagem relacional e persistência com <strong>PostgreSQL</strong> via <strong>Prisma ORM</strong>, suíte de testes com <strong>Jest</strong> e documentação no <strong>Swagger</strong>.</li>
+        <li>Conteinerização completa com <strong>Docker Compose</strong>, assegurando portabilidade, escalabilidade e paridade rigorosa de ambientes.</li>
+      </ul>
+    </div>
+
+    <!-- Leads CRM Platform -->
+    <div class="project-item">
+      <div class="project-top-row">
+        <span class="project-title">Leads CRM Platform</span>
+        <span class="project-link">github.com/gabriel8programmer/leads-api</span>
+      </div>
+      <div class="project-badges">
+        <span class="badge">TypeScript</span>
+        <span class="badge">Express</span>
+        <span class="badge">Next.js</span>
+        <span class="badge">PostgreSQL</span>
+        <span class="badge">Prisma ORM</span>
+        <span class="badge">Tailwind CSS</span>
+        <span class="badge">Docker</span>
+      </div>
+      <div class="project-desc">Sistema corporativo para captura, qualificação e automação de pipeline comercial de prospecção.</div>
+      <ul class="project-bullets">
+        <li>CRUD completo de leads, grupos e campanhas comerciais com arquitetura modular e aplicação rigorosa de <strong>princípios SOLID</strong>.</li>
+        <li>Integração robusta com <strong>PostgreSQL</strong> via Prisma ORM e documentação técnica interativa padronizada via <strong>OpenAPI/Swagger</strong>.</li>
+        <li>Interface responsiva e intuitiva estilizada com <strong>Tailwind CSS</strong> e ambiente conteinerizado via <strong>Docker Compose</strong>.</li>
+      </ul>
+    </div>
+
+    <!-- Todo List Hub -->
+    <div class="project-item">
+      <div class="project-top-row">
+        <span class="project-title">Todo List Hub</span>
+        <span class="project-link">github.com/gabriel8programmer/todo-list-api</span>
+      </div>
+      <div class="project-badges">
+        <span class="badge">Node.js</span>
+        <span class="badge">TypeScript</span>
+        <span class="badge">Express</span>
+        <span class="badge">MongoDB</span>
+        <span class="badge">Mongoose</span>
+        <span class="badge">Docker</span>
+        <span class="badge">Swagger</span>
+        <span class="badge">Jest</span>
+      </div>
+      <div class="project-desc">Aplicação para gerenciamento produtivo de tarefas com controle de acesso granular e persistência NoSQL.</div>
+      <ul class="project-bullets">
+        <li>Autenticação de usuários via <strong>JWT</strong> com controle de permissões baseado em papéis (RBAC) e hashing seguro com Bcrypt.</li>
+        <li>Persistência não-relacional com <strong>MongoDB</strong> e Mongoose, testes automatizados com <strong>Jest</strong> e deploy conteinerizado com <strong>Docker</strong>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FORMAÇÃO E CERTIFICAÇÕES -->
+  <section class="section">
+    <div class="edu-cert-container">
+      <div>
+        <h2 class="section-title"><span class="section-title-bar"></span>Formação Acadêmica</h2>
+        <div class="edu-content">
+          <div class="edu-title">Sup. Téc. em Análise e Desenvolvimento de Sistemas</div>
+          <div class="edu-institution">Universidade Paulista (UNIP)</div>
+          <div class="edu-date">Graduação concluída em Julho de 2024</div>
+          <div class="edu-desc">Formação sólida com ênfase em engenharia de software, modelagem de dados relacionais, lógica algorítmica e arquitetura de sistemas web modernos.</div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title"><span class="section-title-bar"></span>Certificações & Cursos</h2>
+        <ul class="cert-bullets">
+          <li><strong>Especialização Full-Stack & Web Moderna:</strong> OneBitCode (2024)</li>
+          <li>JavaScript (ES6+) Avançado, TypeScript & React / Next.js</li>
+          <li>Aplicações Web de Alta Performance com Node.js & Fastify</li>
+          <li>Modelagem Relacional (SQL, PostgreSQL) & NoSQL (MongoDB) com Prisma ORM</li>
+          <li>Testes Automatizados de Integração (Jest) & Arquitetura Limpa</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer-bar">
+    <div><strong>Idiomas:</strong> Português (Nativo) • Inglês (Técnico / Leitura e Documentação)</div>
+    <div><strong>Disponibilidade:</strong> Imediata para oportunidades Full-Stack / Remoto ou Híbrido</div>
+  </footer>
+
+</body>
+</html>
