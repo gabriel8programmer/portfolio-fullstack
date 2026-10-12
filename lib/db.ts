@@ -27,7 +27,68 @@ export function convertImageToBase64(imagePath: string): string {
   return imagePath;
 }
 
+let tablesInitialized = false;
+
+/**
+ * Garante que as tabelas necessárias existam no banco de dados (SQLite ou Turso).
+ * Evita erros de 'no such table' em ambientes de build ou instâncias recém-criadas.
+ */
+export async function ensureTables(): Promise<void> {
+  if (tablesInitialized) return;
+  try {
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Project" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "title" TEXT NOT NULL,
+        "tagline" TEXT NOT NULL,
+        "taglineEn" TEXT,
+        "description" TEXT NOT NULL,
+        "descriptionEn" TEXT,
+        "category" TEXT NOT NULL DEFAULT 'fullstack',
+        "image" TEXT NOT NULL,
+        "githubUrl" TEXT NOT NULL,
+        "liveUrl" TEXT DEFAULT '',
+        "technologies" TEXT NOT NULL DEFAULT '[]',
+        "featured" BOOLEAN NOT NULL DEFAULT 0,
+        "order" INTEGER NOT NULL DEFAULT 0,
+        "createdAt" TEXT NOT NULL,
+        "stars" INTEGER DEFAULT 0,
+        "forks" INTEGER DEFAULT 0
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "StackItem" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "name" TEXT NOT NULL,
+        "category" TEXT NOT NULL,
+        "iconSlug" TEXT NOT NULL,
+        "level" TEXT NOT NULL DEFAULT 'Intermediário',
+        "color" TEXT DEFAULT '#06b6d4',
+        "order" INTEGER NOT NULL DEFAULT 0
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ContactMessage" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "name" TEXT NOT NULL,
+        "email" TEXT NOT NULL,
+        "message" TEXT NOT NULL,
+        "createdAt" TEXT NOT NULL,
+        "read" BOOLEAN NOT NULL DEFAULT 0
+      );
+    `);
+
+    tablesInitialized = true;
+  } catch (error) {
+    console.warn('Aviso: Não foi possível auto-inicializar as tabelas no banco:', error);
+  }
+}
+
 export async function seedInitialData(): Promise<void> {
+  await ensureTables();
+
   // Seed projects with base64 converted images
   for (const project of initialPortfolioData.projects) {
     const base64Image = convertImageToBase64(project.image);
@@ -128,15 +189,22 @@ function formatProject(p: any): Project {
 
 // Projects operations
 export async function getProjects(): Promise<Project[]> {
-  const projects = await prisma.project.findMany({
-    orderBy: { order: 'asc' },
-  });
-  return projects.map(formatProject);
+  try {
+    await ensureTables();
+    const projects = await prisma.project.findMany({
+      orderBy: { order: 'asc' },
+    });
+    return projects.map(formatProject);
+  } catch (error) {
+    console.warn('Aviso: Não foi possível carregar projetos do banco:', error);
+    return [];
+  }
 }
 
 export async function addProject(
   project: Omit<Project, 'id' | 'createdAt'> & { id?: string }
 ): Promise<Project> {
+  await ensureTables();
   const count = await prisma.project.count();
   const id =
     project.id ||
@@ -168,6 +236,7 @@ export async function addProject(
 }
 
 export async function updateProject(id: string, updates: Partial<Project>): Promise<Project | null> {
+  await ensureTables();
   const existing = await prisma.project.findUnique({ where: { id } });
   if (!existing) return null;
 
@@ -203,6 +272,7 @@ export async function updateProject(id: string, updates: Partial<Project>): Prom
 
 export async function deleteProject(id: string): Promise<boolean> {
   try {
+    await ensureTables();
     await prisma.project.delete({ where: { id } });
     return true;
   } catch {
@@ -212,21 +282,28 @@ export async function deleteProject(id: string): Promise<boolean> {
 
 // Stacks operations
 export async function getStacks(): Promise<StackItem[]> {
-  const stacks = await prisma.stackItem.findMany({
-    orderBy: { order: 'asc' },
-  });
-  return stacks.map((s) => ({
-    id: s.id,
-    name: s.name,
-    category: s.category as StackCategory,
-    iconSlug: s.iconSlug,
-    level: s.level as StackItem['level'],
-    color: s.color || undefined,
-    order: s.order,
-  }));
+  try {
+    await ensureTables();
+    const stacks = await prisma.stackItem.findMany({
+      orderBy: { order: 'asc' },
+    });
+    return stacks.map((s) => ({
+      id: s.id,
+      name: s.name,
+      category: s.category as StackCategory,
+      iconSlug: s.iconSlug,
+      level: s.level as StackItem['level'],
+      color: s.color || undefined,
+      order: s.order,
+    }));
+  } catch (error) {
+    console.warn('Aviso: Não foi possível carregar stacks do banco:', error);
+    return [];
+  }
 }
 
 export async function addStack(stack: Omit<StackItem, 'id'> & { id?: string }): Promise<StackItem> {
+  await ensureTables();
   const count = await prisma.stackItem.count();
   const id = stack.id || stack.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
@@ -254,6 +331,7 @@ export async function addStack(stack: Omit<StackItem, 'id'> & { id?: string }): 
 }
 
 export async function updateStack(id: string, updates: Partial<StackItem>): Promise<StackItem | null> {
+  await ensureTables();
   const existing = await prisma.stackItem.findUnique({ where: { id } });
   if (!existing) return null;
 
@@ -282,6 +360,7 @@ export async function updateStack(id: string, updates: Partial<StackItem>): Prom
 
 export async function deleteStack(id: string): Promise<boolean> {
   try {
+    await ensureTables();
     await prisma.stackItem.delete({ where: { id } });
     return true;
   } catch {
@@ -291,22 +370,29 @@ export async function deleteStack(id: string): Promise<boolean> {
 
 // Contact messages operations
 export async function getMessages(): Promise<ContactMessage[]> {
-  const messages = await prisma.contactMessage.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
-  return messages.map((m) => ({
-    id: m.id,
-    name: m.name,
-    email: m.email,
-    message: m.message,
-    createdAt: m.createdAt,
-    read: m.read,
-  }));
+  try {
+    await ensureTables();
+    const messages = await prisma.contactMessage.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return messages.map((m) => ({
+      id: m.id,
+      name: m.name,
+      email: m.email,
+      message: m.message,
+      createdAt: m.createdAt,
+      read: m.read,
+    }));
+  } catch (error) {
+    console.warn('Aviso: Não foi possível carregar mensagens do banco:', error);
+    return [];
+  }
 }
 
 export async function addMessage(
   msg: Omit<ContactMessage, 'id' | 'createdAt' | 'read'>
 ): Promise<ContactMessage> {
+  await ensureTables();
   const created = await prisma.contactMessage.create({
     data: {
       id: 'msg-' + Date.now().toString(36),
@@ -329,6 +415,7 @@ export async function addMessage(
 
 export async function deleteMessage(id: string): Promise<boolean> {
   try {
+    await ensureTables();
     await prisma.contactMessage.delete({ where: { id } });
     return true;
   } catch {
@@ -346,6 +433,7 @@ export async function getPortfolioData(): Promise<PortfolioData> {
 }
 
 export async function resetPortfolioData(): Promise<PortfolioData> {
+  await ensureTables();
   await prisma.project.deleteMany();
   await prisma.stackItem.deleteMany();
   await prisma.contactMessage.deleteMany();
