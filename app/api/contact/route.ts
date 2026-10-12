@@ -3,7 +3,7 @@ import { getMessages, addMessage, deleteMessage } from '@/lib/db';
 
 export async function GET() {
   try {
-    const messages = getMessages();
+    const messages = await getMessages();
     return NextResponse.json(messages);
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao listar mensagens' }, { status: 500 });
@@ -31,8 +31,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const saved = addMessage({ name, email, message });
-    return NextResponse.json({ success: true, message: 'Mensagem enviada com sucesso!', data: saved }, { status: 201 });
+    const saved = await addMessage({ name, email, message });
+    return NextResponse.json(
+      { success: true, message: 'Mensagem enviada com sucesso!', data: saved },
+      { status: 201 }
+    );
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao processar mensagem' }, { status: 500 });
   }
@@ -46,7 +49,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID da mensagem é obrigatório' }, { status: 400 });
     }
 
-    const deleted = deleteMessage(id);
+    const deleted = await deleteMessage(id);
     return NextResponse.json({ success: deleted });
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao excluir mensagem' }, { status: 500 });

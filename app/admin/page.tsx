@@ -583,6 +583,7 @@ export default function AdminPage() {
                       src={proj.image || '/img/projects/todo-list.png'}
                       alt={proj.title}
                       fill
+                      unoptimized={proj.image?.startsWith('data:')}
                       className="object-cover object-top"
                     />
                     {proj.featured && (
@@ -825,6 +826,7 @@ export default function AdminPage() {
                     src={projectForm.image}
                     alt="Preview"
                     fill
+                    unoptimized={projectForm.image?.startsWith('data:')}
                     className="object-cover"
                   />
                 ) : (

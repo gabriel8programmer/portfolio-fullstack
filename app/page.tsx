@@ -9,8 +9,8 @@ import { getProjects, getStacks } from '@/lib/db';
 export const revalidate = 60; // ISR revalidate every 60s
 
 export default async function HomePage() {
-  const initialProjects = getProjects();
-  const initialStacks = getStacks();
+  const initialProjects = await getProjects();
+  const initialStacks = await getStacks();
 
   return (
     <div className="relative">

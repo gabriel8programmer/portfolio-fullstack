@@ -1,0 +1,50 @@
+// Prisma schema for portfolio-fullstack
+// Database: SQLite / libSQL (Turso compatible)
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id            String   @id
+  title         String
+  tagline       String
+  taglineEn     String?
+  description   String
+  descriptionEn String?
+  category      String   @default("fullstack")
+  image         String   // Base64 Data URL (data:image/...;base64,...)
+  githubUrl     String
+  liveUrl       String?  @default("")
+  technologies  String   @default("[]") // JSON string list of technologies
+  featured      Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     String
+  stars         Int?     @default(0)
+  forks         Int?     @default(0)
+}
+
+model StackItem {
+  id       String  @id
+  name     String
+  category String
+  iconSlug String
+  level    String  @default("Intermediário")
+  color    String? @default("#06b6d4")
+  order    Int     @default(0)
+}
+
+model ContactMessage {
+  id        String  @id
+  name      String
+  email     String
+  message   String
+  createdAt String
+  read      Boolean @default(false)
+}

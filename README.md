@@ -36,8 +36,8 @@ Portfólio interativo de alta performance construído para apresentar produtos d
 
 - **Frontend:** Next.js 14, React 18, Tailwind CSS, Lucide React, Canvas API
 - **Backend:** Next.js Route Handlers (RESTful APIs), Node.js
-- **Banco de Dados / Armazenamento:** File-based JSON Database com seeding automático
-- **Tipagem & Ferramental:** TypeScript, PostCSS, ESLint
+- **Banco de Dados / ORM:** SQLite / Turso (libSQL) via Prisma ORM 6 com armazenamento de capas em Base64
+- **Tipagem & Ferramental:** TypeScript, Prisma, Turso CLI, PostCSS
 
 ---
 

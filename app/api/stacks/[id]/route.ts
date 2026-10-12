@@ -9,7 +9,7 @@ export async function PUT(
     const id = params.id;
     const body = await request.json();
 
-    const updated = updateStack(id, body);
+    const updated = await updateStack(id, body);
     if (!updated) {
       return NextResponse.json({ error: 'Stack não encontrada' }, { status: 404 });
     }
@@ -26,7 +26,7 @@ export async function DELETE(
 ) {
   try {
     const id = params.id;
-    const success = deleteStack(id);
+    const success = await deleteStack(id);
     if (!success) {
       return NextResponse.json({ error: 'Stack não encontrada' }, { status: 404 });
     }

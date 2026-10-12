@@ -3,7 +3,7 @@ import { getStacks, addStack } from '@/lib/db';
 
 export async function GET() {
   try {
-    const stacks = getStacks();
+    const stacks = await getStacks();
     return NextResponse.json(stacks);
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao buscar stacks' }, { status: 500 });
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Nome e categoria são obrigatórios' }, { status: 400 });
     }
 
-    const stack = addStack({
+    const stack = await addStack({
       name: body.name,
       category: body.category,
       iconSlug: body.iconSlug || body.name.toLowerCase().replace(/[^a-z0-9]/g, ''),

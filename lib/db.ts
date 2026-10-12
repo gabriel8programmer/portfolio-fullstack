@@ -1,165 +1,355 @@
 import fs from 'fs';
 import path from 'path';
-import { PortfolioData, Project, StackItem, ContactMessage } from '@/types';
+import { prisma } from './prisma';
+import { PortfolioData, Project, StackItem, ContactMessage, StackCategory } from '@/types';
 import { initialPortfolioData } from './default-data';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'portfolio-data.json');
+/**
+ * Converte caminhos locais de imagens em Base64 Data URL (data:image/...;base64,...)
+ * Caso a imagem já esteja em Base64, preserva intacta.
+ */
+export function convertImageToBase64(imagePath: string): string {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('data:')) return imagePath;
 
-function ensureDataFile(): void {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(initialPortfolioData, null, 2), 'utf-8');
+    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+    const fullPath = path.join(process.cwd(), 'public', cleanPath);
+    if (fs.existsSync(fullPath)) {
+      const ext = path.extname(fullPath).toLowerCase().replace('.', '') || 'png';
+      const mime = ext === 'jpg' ? 'jpeg' : ext === 'svg' ? 'svg+xml' : ext;
+      const fileBuffer = fs.readFileSync(fullPath);
+      return `data:image/${mime};base64,${fileBuffer.toString('base64')}`;
     }
   } catch (error) {
-    console.error('Error ensuring data file exists:', error);
+    console.error('Erro ao converter imagem para base64:', error);
+  }
+  return imagePath;
+}
+
+export async function seedInitialData(): Promise<void> {
+  // Seed projects with base64 converted images
+  for (const project of initialPortfolioData.projects) {
+    const base64Image = convertImageToBase64(project.image);
+    await prisma.project.upsert({
+      where: { id: project.id },
+      update: {
+        title: project.title,
+        tagline: project.tagline,
+        taglineEn: project.taglineEn || null,
+        description: project.description,
+        descriptionEn: project.descriptionEn || null,
+        category: project.category,
+        image: base64Image,
+        githubUrl: project.githubUrl,
+        liveUrl: project.liveUrl || '',
+        technologies: JSON.stringify(project.technologies || []),
+        featured: Boolean(project.featured),
+        order: project.order ?? 0,
+        createdAt: project.createdAt || new Date().toISOString().split('T')[0],
+        stars: project.stats?.stars ?? 0,
+        forks: project.stats?.forks ?? 0,
+      },
+      create: {
+        id: project.id,
+        title: project.title,
+        tagline: project.tagline,
+        taglineEn: project.taglineEn || null,
+        description: project.description,
+        descriptionEn: project.descriptionEn || null,
+        category: project.category,
+        image: base64Image,
+        githubUrl: project.githubUrl,
+        liveUrl: project.liveUrl || '',
+        technologies: JSON.stringify(project.technologies || []),
+        featured: Boolean(project.featured),
+        order: project.order ?? 0,
+        createdAt: project.createdAt || new Date().toISOString().split('T')[0],
+        stars: project.stats?.stars ?? 0,
+        forks: project.stats?.forks ?? 0,
+      },
+    });
+  }
+
+  // Seed stacks
+  for (const stack of initialPortfolioData.stacks) {
+    await prisma.stackItem.upsert({
+      where: { id: stack.id },
+      update: {
+        name: stack.name,
+        category: stack.category,
+        iconSlug: stack.iconSlug,
+        level: stack.level,
+        color: stack.color || '#06b6d4',
+        order: stack.order ?? 0,
+      },
+      create: {
+        id: stack.id,
+        name: stack.name,
+        category: stack.category,
+        iconSlug: stack.iconSlug,
+        level: stack.level,
+        color: stack.color || '#06b6d4',
+        order: stack.order ?? 0,
+      },
+    });
   }
 }
 
-export function getPortfolioData(): PortfolioData {
-  ensureDataFile();
+function formatProject(p: any): Project {
+  let tech: string[] = [];
   try {
-    const fileContent = fs.readFileSync(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(fileContent);
-    return {
-      projects: parsed.projects || initialPortfolioData.projects,
-      stacks: parsed.stacks || initialPortfolioData.stacks,
-      messages: parsed.messages || [],
-    };
-  } catch (error) {
-    console.error('Error reading portfolio data, falling back to initial data:', error);
-    return initialPortfolioData;
+    tech = typeof p.technologies === 'string' ? JSON.parse(p.technologies) : p.technologies || [];
+  } catch {
+    tech = p.technologies ? [p.technologies] : [];
   }
+
+  return {
+    id: p.id,
+    title: p.title,
+    tagline: p.tagline,
+    taglineEn: p.taglineEn || undefined,
+    description: p.description,
+    descriptionEn: p.descriptionEn || undefined,
+    category: p.category as Project['category'],
+    image: p.image,
+    githubUrl: p.githubUrl,
+    liveUrl: p.liveUrl || undefined,
+    technologies: tech,
+    featured: Boolean(p.featured),
+    order: p.order ?? 0,
+    createdAt: p.createdAt,
+    stats: {
+      stars: p.stars ?? 0,
+      forks: p.forks ?? 0,
+    },
+  };
 }
 
-export function savePortfolioData(data: PortfolioData): boolean {
-  ensureDataFile();
+// Projects operations
+export async function getProjects(): Promise<Project[]> {
+  const projects = await prisma.project.findMany({
+    orderBy: { order: 'asc' },
+  });
+  return projects.map(formatProject);
+}
+
+export async function addProject(
+  project: Omit<Project, 'id' | 'createdAt'> & { id?: string }
+): Promise<Project> {
+  const count = await prisma.project.count();
+  const id =
+    project.id ||
+    project.title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now().toString(36);
+  const base64Image = convertImageToBase64(project.image);
+
+  const created = await prisma.project.create({
+    data: {
+      id,
+      title: project.title,
+      tagline: project.tagline,
+      taglineEn: project.taglineEn || null,
+      description: project.description,
+      descriptionEn: project.descriptionEn || null,
+      category: project.category || 'fullstack',
+      image: base64Image,
+      githubUrl: project.githubUrl || 'https://github.com/gabriel8programmer',
+      liveUrl: project.liveUrl || '',
+      technologies: JSON.stringify(project.technologies || []),
+      featured: Boolean(project.featured),
+      order: project.order ?? count + 1,
+      createdAt: new Date().toISOString().split('T')[0],
+      stars: project.stats?.stars ?? 0,
+      forks: project.stats?.forks ?? 0,
+    },
+  });
+
+  return formatProject(created);
+}
+
+export async function updateProject(id: string, updates: Partial<Project>): Promise<Project | null> {
+  const existing = await prisma.project.findUnique({ where: { id } });
+  if (!existing) return null;
+
+  const dataToUpdate: any = {};
+  if (updates.title !== undefined) dataToUpdate.title = updates.title;
+  if (updates.tagline !== undefined) dataToUpdate.tagline = updates.tagline;
+  if (updates.taglineEn !== undefined) dataToUpdate.taglineEn = updates.taglineEn;
+  if (updates.description !== undefined) dataToUpdate.description = updates.description;
+  if (updates.descriptionEn !== undefined) dataToUpdate.descriptionEn = updates.descriptionEn;
+  if (updates.category !== undefined) dataToUpdate.category = updates.category;
+  if (updates.image !== undefined) dataToUpdate.image = convertImageToBase64(updates.image);
+  if (updates.githubUrl !== undefined) dataToUpdate.githubUrl = updates.githubUrl;
+  if (updates.liveUrl !== undefined) dataToUpdate.liveUrl = updates.liveUrl;
+  if (updates.technologies !== undefined) {
+    dataToUpdate.technologies = Array.isArray(updates.technologies)
+      ? JSON.stringify(updates.technologies)
+      : updates.technologies;
+  }
+  if (updates.featured !== undefined) dataToUpdate.featured = Boolean(updates.featured);
+  if (updates.order !== undefined) dataToUpdate.order = Number(updates.order);
+  if (updates.stats) {
+    if (updates.stats.stars !== undefined) dataToUpdate.stars = updates.stats.stars;
+    if (updates.stats.forks !== undefined) dataToUpdate.forks = updates.stats.forks;
+  }
+
+  const updated = await prisma.project.update({
+    where: { id },
+    data: dataToUpdate,
+  });
+
+  return formatProject(updated);
+}
+
+export async function deleteProject(id: string): Promise<boolean> {
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    await prisma.project.delete({ where: { id } });
     return true;
-  } catch (error) {
-    console.error('Error saving portfolio data:', error);
+  } catch {
     return false;
   }
 }
 
-// Projects operations
-export function getProjects(): Project[] {
-  const data = getPortfolioData();
-  return data.projects.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-}
-
-export function addProject(project: Omit<Project, 'id' | 'createdAt'> & { id?: string }): Project {
-  const data = getPortfolioData();
-  const id = project.id || project.title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now().toString(36);
-  const newProject: Project = {
-    ...project,
-    id,
-    order: project.order ?? data.projects.length + 1,
-    createdAt: new Date().toISOString().split('T')[0],
-  };
-  data.projects.push(newProject);
-  savePortfolioData(data);
-  return newProject;
-}
-
-export function updateProject(id: string, updates: Partial<Project>): Project | null {
-  const data = getPortfolioData();
-  const index = data.projects.findIndex((p) => p.id === id);
-  if (index === -1) return null;
-
-  data.projects[index] = {
-    ...data.projects[index],
-    ...updates,
-    id, // protect ID
-  };
-  savePortfolioData(data);
-  return data.projects[index];
-}
-
-export function deleteProject(id: string): boolean {
-  const data = getPortfolioData();
-  const initialLength = data.projects.length;
-  data.projects = data.projects.filter((p) => p.id !== id);
-  if (data.projects.length === initialLength) return false;
-  savePortfolioData(data);
-  return true;
-}
-
 // Stacks operations
-export function getStacks(): StackItem[] {
-  const data = getPortfolioData();
-  return data.stacks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+export async function getStacks(): Promise<StackItem[]> {
+  const stacks = await prisma.stackItem.findMany({
+    orderBy: { order: 'asc' },
+  });
+  return stacks.map((s) => ({
+    id: s.id,
+    name: s.name,
+    category: s.category as StackCategory,
+    iconSlug: s.iconSlug,
+    level: s.level as StackItem['level'],
+    color: s.color || undefined,
+    order: s.order,
+  }));
 }
 
-export function addStack(stack: Omit<StackItem, 'id'> & { id?: string }): StackItem {
-  const data = getPortfolioData();
+export async function addStack(stack: Omit<StackItem, 'id'> & { id?: string }): Promise<StackItem> {
+  const count = await prisma.stackItem.count();
   const id = stack.id || stack.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  const newStack: StackItem = {
-    ...stack,
-    id,
-    order: stack.order ?? data.stacks.length + 1,
+
+  const created = await prisma.stackItem.create({
+    data: {
+      id,
+      name: stack.name,
+      category: stack.category,
+      iconSlug: stack.iconSlug || stack.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      level: stack.level || 'Intermediário',
+      color: stack.color || '#06b6d4',
+      order: stack.order ?? count + 1,
+    },
+  });
+
+  return {
+    id: created.id,
+    name: created.name,
+    category: created.category as StackCategory,
+    iconSlug: created.iconSlug,
+    level: created.level as StackItem['level'],
+    color: created.color || undefined,
+    order: created.order,
   };
-  data.stacks.push(newStack);
-  savePortfolioData(data);
-  return newStack;
 }
 
-export function updateStack(id: string, updates: Partial<StackItem>): StackItem | null {
-  const data = getPortfolioData();
-  const index = data.stacks.findIndex((s) => s.id === id);
-  if (index === -1) return null;
+export async function updateStack(id: string, updates: Partial<StackItem>): Promise<StackItem | null> {
+  const existing = await prisma.stackItem.findUnique({ where: { id } });
+  if (!existing) return null;
 
-  data.stacks[index] = {
-    ...data.stacks[index],
-    ...updates,
-    id,
+  const updated = await prisma.stackItem.update({
+    where: { id },
+    data: {
+      ...(updates.name !== undefined && { name: updates.name }),
+      ...(updates.category !== undefined && { category: updates.category }),
+      ...(updates.iconSlug !== undefined && { iconSlug: updates.iconSlug }),
+      ...(updates.level !== undefined && { level: updates.level }),
+      ...(updates.color !== undefined && { color: updates.color }),
+      ...(updates.order !== undefined && { order: Number(updates.order) }),
+    },
+  });
+
+  return {
+    id: updated.id,
+    name: updated.name,
+    category: updated.category as StackCategory,
+    iconSlug: updated.iconSlug,
+    level: updated.level as StackItem['level'],
+    color: updated.color || undefined,
+    order: updated.order,
   };
-  savePortfolioData(data);
-  return data.stacks[index];
 }
 
-export function deleteStack(id: string): boolean {
-  const data = getPortfolioData();
-  const initialLength = data.stacks.length;
-  data.stacks = data.stacks.filter((s) => s.id !== id);
-  if (data.stacks.length === initialLength) return false;
-  savePortfolioData(data);
-  return true;
+export async function deleteStack(id: string): Promise<boolean> {
+  try {
+    await prisma.stackItem.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // Contact messages operations
-export function getMessages(): ContactMessage[] {
-  const data = getPortfolioData();
-  return (data.messages || []).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export async function getMessages(): Promise<ContactMessage[]> {
+  const messages = await prisma.contactMessage.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+  return messages.map((m) => ({
+    id: m.id,
+    name: m.name,
+    email: m.email,
+    message: m.message,
+    createdAt: m.createdAt,
+    read: m.read,
+  }));
 }
 
-export function addMessage(msg: Omit<ContactMessage, 'id' | 'createdAt' | 'read'>): ContactMessage {
-  const data = getPortfolioData();
-  const newMessage: ContactMessage = {
-    ...msg,
-    id: 'msg-' + Date.now().toString(36),
-    createdAt: new Date().toISOString(),
-    read: false,
+export async function addMessage(
+  msg: Omit<ContactMessage, 'id' | 'createdAt' | 'read'>
+): Promise<ContactMessage> {
+  const created = await prisma.contactMessage.create({
+    data: {
+      id: 'msg-' + Date.now().toString(36),
+      name: msg.name,
+      email: msg.email,
+      message: msg.message,
+      createdAt: new Date().toISOString(),
+      read: false,
+    },
+  });
+  return {
+    id: created.id,
+    name: created.name,
+    email: created.email,
+    message: created.message,
+    createdAt: created.createdAt,
+    read: created.read,
   };
-  if (!data.messages) data.messages = [];
-  data.messages.unshift(newMessage);
-  savePortfolioData(data);
-  return newMessage;
 }
 
-export function deleteMessage(id: string): boolean {
-  const data = getPortfolioData();
-  if (!data.messages) return false;
-  data.messages = data.messages.filter((m) => m.id !== id);
-  savePortfolioData(data);
-  return true;
+export async function deleteMessage(id: string): Promise<boolean> {
+  try {
+    await prisma.contactMessage.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export function resetPortfolioData(): PortfolioData {
-  savePortfolioData(initialPortfolioData);
-  return initialPortfolioData;
+export async function getPortfolioData(): Promise<PortfolioData> {
+  const [projects, stacks, messages] = await Promise.all([
+    getProjects(),
+    getStacks(),
+    getMessages(),
+  ]);
+  return { projects, stacks, messages };
+}
+
+export async function resetPortfolioData(): Promise<PortfolioData> {
+  await prisma.project.deleteMany();
+  await prisma.stackItem.deleteMany();
+  await prisma.contactMessage.deleteMany();
+
+  await seedInitialData();
+  return getPortfolioData();
 }

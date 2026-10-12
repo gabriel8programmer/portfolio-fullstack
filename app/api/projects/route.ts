@@ -3,7 +3,7 @@ import { getProjects, addProject } from '@/lib/db';
 
 export async function GET() {
   try {
-    const projects = getProjects();
+    const projects = await getProjects();
     return NextResponse.json(projects);
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao buscar projetos' }, { status: 500 });
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Título e descrição são obrigatórios' }, { status: 400 });
     }
 
-    const project = addProject({
+    const project = await addProject({
       title: body.title,
       tagline: body.tagline || body.title,
       description: body.description,

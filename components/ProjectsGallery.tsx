@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Project } from '@/types';
-import { initialPortfolioData } from '@/lib/default-data';
 import {
   ExternalLink,
   Github,
@@ -18,7 +17,7 @@ import {
 import { Modal } from '@/components/Modal';
 import { useLanguage } from '@/context/LanguageContext';
 
-export function ProjectsGallery({ initialProjects = initialPortfolioData.projects }: { initialProjects?: Project[] }) {
+export function ProjectsGallery({ initialProjects = [] }: { initialProjects?: Project[] }) {
   const { t, language } = useLanguage();
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -30,12 +29,12 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
         const res = await fetch('/api/projects');
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             setProjects(data);
           }
         }
       } catch (err) {
-        // Fallback to initial
+        // Keep current state
       }
     }
     loadProjects();
@@ -123,6 +122,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                   src={project.image || '/img/projects/todo-list.png'}
                   alt={project.title}
                   fill
+                  unoptimized={project.image?.startsWith('data:')}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-110"
                 />
@@ -236,6 +236,7 @@ export function ProjectsGallery({ initialProjects = initialPortfolioData.project
                 src={activeModalProject.image || '/img/projects/todo-list.png'}
                 alt={activeModalProject.title}
                 fill
+                unoptimized={activeModalProject.image?.startsWith('data:')}
                 className="object-cover object-top"
               />
             </div>

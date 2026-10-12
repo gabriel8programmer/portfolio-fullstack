@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
 
 export async function POST(request: Request) {
   try {
@@ -37,41 +35,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read bytes
+    // Read bytes & convert to Base64 Data URL
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    // Ensure target directory exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'projects');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // Create safe unique filename
-    const originalName = file.name || 'image.png';
-    const ext = path.extname(originalName) || '.png';
-    const baseName = path
-      .basename(originalName, ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '-');
-    const filename = `${baseName}-${Date.now().toString(36)}${ext}`;
-    const filePath = path.join(uploadDir, filename);
-
-    // Save file
-    fs.writeFileSync(filePath, buffer);
-
-    const publicUrl = `/uploads/projects/${filename}`;
+    const mimeType = file.type || 'image/png';
+    const base64DataUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
     return NextResponse.json({
       success: true,
-      url: publicUrl,
-      filename,
+      url: base64DataUrl,
+      name: file.name,
       size: file.size,
     });
   } catch (error) {
-    console.error('Erro ao fazer upload da imagem:', error);
+    console.error('Erro ao converter upload para base64:', error);
     return NextResponse.json(
-      { error: 'Falha ao salvar a imagem no servidor.' },
+      { error: 'Falha ao processar a imagem.' },
       { status: 500 }
     );
   }

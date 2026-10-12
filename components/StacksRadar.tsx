@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { StackItem, StackCategory } from '@/types';
-import { initialPortfolioData } from '@/lib/default-data';
 import { Search, Sparkles, Layers, Cpu, Database, Wrench, Globe, Filter } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
-export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { initialStacks?: StackItem[] }) {
+export function StacksRadar({ initialStacks = [] }: { initialStacks?: StackItem[] }) {
   const { t, language } = useLanguage();
   const [stacks, setStacks] = useState<StackItem[]>(initialStacks);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -19,12 +18,12 @@ export function StacksRadar({ initialStacks = initialPortfolioData.stacks }: { i
         const res = await fetch('/api/stacks');
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             setStacks(data);
           }
         }
       } catch (err) {
-        // use initial fallback
+        // Keep current state
       }
     }
     loadStacks();
